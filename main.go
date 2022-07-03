@@ -3,54 +3,68 @@ package main
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"github.com/open-policy-agent/opa/rego"
 )
 
 func main() {
+	module := `
+    package example.authz
+    
+    import future.keywords
+    
+    default allow := false
+    
+    allow {
+        is_admin
+    }
 
+    optional[{"key":key,"msg":msg}]{
+        is_admin
+        
+        key :="example_key"
+        msg :="example message"
+    }
+
+    is_admin {
+        "admin" in input.subject.groups
+    }
+    
+
+
+    `
 	ctx := context.Background()
+	query, err := rego.New(
+		rego.Query("data.example.authz.optional"),
+		rego.Module("example.rego", module),
+	).PrepareForEval(ctx)
 
-	// Create query that produces a single document.
-	rego := rego.New(
-		rego.Query("data.example.optional"),
-		rego.Module("example.rego",
-			`package example
+	if err != nil {
+		// Handle error.
+	}
 
-            sites := [
-                {"name": "prod"},
-                {"name": "smoke1"},
-                {"name": "dev"}
-            ]
-            
-            q[name] { name := [
-                {"name": "prod"},
-                {"name": "smoke1"},
-                {"name": "dev"}
-            ] }
+	input := map[string]interface{}{
+		"method": "GET",
+		"path":   []interface{}{"salary", "bob"},
+		"subject": map[string]interface{}{
+			"user":   "bob",
+			"groups": []interface{}{"sales", "marketing","admin"},
+		},
+	}
 
-            optional[{"key":key,"msg":msg}]{
-            
-                key :="example_key"
-                msg :="example message"
-            }
-            `,
-		))
-
-	// Run evaluation.
-	rs, err := rego.Eval(ctx)
-    result:=rs[0].Expressions[0].Value.([]interface {})[0].(map[string]interface {})
-	fmt.Println(rs)
+	rs, err := query.Eval(ctx, rego.EvalInput(input))
+	// result := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
+	result := rs[0].Expressions[0].Value.([]interface{})[0].(map[string]interface{})
+	fmt.Println(result)
 	// fmt.Println(len(rs))
-    fmt.Println(reflect.TypeOf(rs[0]))
-    fmt.Println(rs[0].Expressions[0])
-    fmt.Println(rs[0].Expressions[0].Text)
-    fmt.Println(rs[0].Expressions[0].Location)
-    fmt.Println(reflect.TypeOf(rs[0].Expressions[0]))
-    // fmt.Println(rs[0].Expressions[0].Value.([]interface {})[0].(map[string]interface {})["key"])
-    fmt.Println(result["key"])
-    fmt.Println(result["msg"])
+	// fmt.Println(reflect.TypeOf(rs[0]))
+	// fmt.Println(rs[0].Expressions[0])
+	// fmt.Println(rs[0].Expressions[0].Text)
+	// fmt.Println(rs[0].Expressions[0].Location)
+	// fmt.Println(reflect.TypeOf(rs[0].Expressions[0]))
+	// fmt.Println(rs[0].Expressions[0].Value.([]interface {})[0].(map[string]interface {})["key"])
+	fmt.Println(result["key"])
+	fmt.Println(result["msg"])
 
 	// Inspect result.
 	// fmt.Println("value:", rs[0].Bindings)
