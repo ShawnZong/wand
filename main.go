@@ -26,6 +26,13 @@ func main() {
         msg :="example message"
     }
 
+    optional[{"key":key,"msg":msg}]{
+        is_admin
+        
+        key :="example_key2"
+        msg :="example message2"
+    }
+
     is_admin {
         "admin" in input.subject.groups
     }
@@ -54,8 +61,13 @@ func main() {
 
 	rs, err := query.Eval(ctx, rego.EvalInput(input))
 	// result := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
-	result := rs[0].Expressions[0].Value.([]interface{})[0].(map[string]interface{})
-	fmt.Println(result)
+	for _,value := range rs[0].Expressions[0].Value.([]interface{}){
+        result:=value.(map[string]interface{})
+        fmt.Println(result["key"])
+    }
+    // result := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
+	// fmt.Println(rs)
+    // fmt.Println(result)
 	// fmt.Println(len(rs))
 	// fmt.Println(reflect.TypeOf(rs[0]))
 	// fmt.Println(rs[0].Expressions[0])
@@ -63,8 +75,8 @@ func main() {
 	// fmt.Println(rs[0].Expressions[0].Location)
 	// fmt.Println(reflect.TypeOf(rs[0].Expressions[0]))
 	// fmt.Println(rs[0].Expressions[0].Value.([]interface {})[0].(map[string]interface {})["key"])
-	fmt.Println(result["key"])
-	fmt.Println(result["msg"])
+	// fmt.Println(result["key"])
+	// fmt.Println(result["msg"])
 
 	// Inspect result.
 	// fmt.Println("value:", rs[0].Bindings)
