@@ -9,7 +9,7 @@ import (
 
 func main() {
 	module := `
-    package example.authz
+    package main
     
     import future.keywords
     
@@ -36,38 +36,53 @@ func main() {
     is_admin {
         "admin" in input.subject.groups
     }
+    `
+
+	module2 := `
+    package main
+
+default hello = false
+optional[{"key":key,"msg":msg}]{
+    is_admin
     
-
-
+    key :="example_key3"
+    msg :="example message3"
+}
+hello {
+    m := input.message
+    m == "world"
+}
     `
 	ctx := context.Background()
-	query, err := rego.New(
-		rego.Query("data.example.authz.optional"),
-		rego.Module("example.rego", module),
-	).PrepareForEval(ctx)
-
-	if err != nil {
-		// Handle error.
-	}
 
 	input := map[string]interface{}{
 		"method": "GET",
 		"path":   []interface{}{"salary", "bob"},
 		"subject": map[string]interface{}{
 			"user":   "bob",
-			"groups": []interface{}{"sales", "marketing","admin"},
+			"groups": []interface{}{"sales", "marketing", "admin"},
 		},
 	}
 
-	rs, err := query.Eval(ctx, rego.EvalInput(input))
+	rs, err := rego.New(
+		rego.Query("data.main"),
+		rego.Module("module1", module),
+		rego.Module("module2", module2),
+		rego.Input(input),
+	).Eval(ctx)
+
+	if err != nil {
+		// Handle error.
+	}
+	// rs, err := query.Eval(ctx, rego.EvalInput(input))
 	// result := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
-	for _,value := range rs[0].Expressions[0].Value.([]interface{}){
-        result:=value.(map[string]interface{})
-        fmt.Println(result["key"])
-    }
-    // result := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
-	// fmt.Println(rs)
-    // fmt.Println(result)
+	// for _, value := range rs[0].Expressions[0].Value.([]interface{}) {
+	// 	result := value.(map[string]interface{})
+	// 	fmt.Println(result["key"])
+	// }
+	// result := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
+	fmt.Println(rs)
+	// fmt.Println(result)
 	// fmt.Println(len(rs))
 	// fmt.Println(reflect.TypeOf(rs[0]))
 	// fmt.Println(rs[0].Expressions[0])
