@@ -3,9 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/open-policy-agent/opa/rego"
 )
+
+// func ExecuteOptional()
+
+func ExtractOptional(queryResult rego.ResultSet) []interface{} {
+	return queryResult[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface{})
+}
 
 func main() {
 	module := `
@@ -42,11 +49,17 @@ func main() {
     package main
 
 default hello = false
-optional[{"key":key,"msg":msg}]{
+optional[{key:msg}]{
     is_admin
     
     key :="example_key3"
     msg :="example message3"
+}
+optional[{key:msg}]{
+    is_admin
+    
+    key :="example_key3"
+    msg :="example message4"
 }
 hello {
     m := input.message
@@ -81,7 +94,13 @@ hello {
 	// 	fmt.Println(result["key"])
 	// }
 	// result := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
-	fmt.Println(rs)
+	result := ExtractOptional(rs)
+	fmt.Println(result)
+	fmt.Println(reflect.TypeOf(result))
+
+	// fmt.Println(rs)
+	// fmt.Println(reflect.TypeOf(rs))
+
 	// fmt.Println(result)
 	// fmt.Println(len(rs))
 	// fmt.Println(reflect.TypeOf(rs[0]))
