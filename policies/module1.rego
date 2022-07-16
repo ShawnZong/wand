@@ -1,4 +1,4 @@
-package example.authz
+package main
 
 import future.keywords
 
@@ -8,14 +8,14 @@ allow {
 	is_admin
 }
 
-optional[{"key": key, "msg": msg}] {
+optional[{key: msg}] {
 	is_admin
 
 	key := "example_key"
 	msg := "example message"
 }
 
-optional[{"key": key, "msg": msg}] {
+optional[{key: msg}] {
 	is_admin
 
 	key := "example_key2"

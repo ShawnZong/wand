@@ -1,12 +1,19 @@
-package example.authz
+package main
 
 default hello = false
 
-optional[{"key": key, "msg": msg}] {
+optional[{key: msg}] {
 	is_admin
 
 	key := "example_key3"
 	msg := "example message3"
+}
+
+optional[{key: msg}] {
+	is_admin
+
+	key := "example_key3"
+	msg := "example message4"
 }
 
 hello {
