@@ -15,19 +15,20 @@ import (
 //     for i:= range
 // }
 
-func getCompiler() (*ast.Compiler, error) {
+func getCompiler() *ast.Compiler {
 	path := []string{"./policies"}
 	policies, err := loader.AllRegos(path)
 	if err != nil {
-		return nil, fmt.Errorf("loading error: %v", err)
+		fmt.Printf("Error during loading policies: %v \n", err)
+		return nil
 	} else if len(policies.Modules) == 0 {
-		return nil, fmt.Errorf("no policy files found in: %v", path)
-
+		fmt.Printf("No policy files found in: %v \n", path)
+		return nil
 	}
 
 	compiler := ast.NewCompiler().WithCapabilities(ast.CapabilitiesForThisVersion())
 	compiler.Compile(policies.ParsedModules())
-	return compiler, nil
+	return compiler
 }
 
 func extractOptional(queryResult rego.ResultSet) []interface{} {
@@ -35,59 +36,59 @@ func extractOptional(queryResult rego.ResultSet) []interface{} {
 }
 
 func main() {
-// 	module := `
-//     package main
-    
-//     import future.keywords
-    
-//     default allow := false
-    
-//     allow {
-//         is_admin
-//     }
+	// 	module := `
+	//     package main
 
-//     optional[{key:msg}]{
-//         is_admin
-        
-//         key :="example_key"
-//         msg :="example message"
-//     }
+	//     import future.keywords
 
-//     optional[{key:msg}]{
-//         is_admin
-        
-//         key :="example_key2"
-//         msg :="example message2"
-//     }
+	//     default allow := false
 
-//     is_admin {
-//         "admin" in input.subject.groups
-//     }
-//     `
+	//     allow {
+	//         is_admin
+	//     }
 
-// 	module2 := `
-//     package main
+	//     optional[{key:msg}]{
+	//         is_admin
 
-// default hello = false
-// optional[{key:msg}]{
-//     is_admin
-    
-//     key :="example_key3"
-//     msg :="example message3"
-// }
-// optional[{key:msg}]{
-//     is_admin
-    
-//     key :="example_key3"
-//     msg :="example message4"
-// }
-// hello {
-//     m := input.message
-//     m == "world"
-// }
-//     `
-	
-    ctx := context.Background()
+	//         key :="example_key"
+	//         msg :="example message"
+	//     }
+
+	//     optional[{key:msg}]{
+	//         is_admin
+
+	//         key :="example_key2"
+	//         msg :="example message2"
+	//     }
+
+	//     is_admin {
+	//         "admin" in input.subject.groups
+	//     }
+	//     `
+
+	// 	module2 := `
+	//     package main
+
+	// default hello = false
+	// optional[{key:msg}]{
+	//     is_admin
+
+	//     key :="example_key3"
+	//     msg :="example message3"
+	// }
+	// optional[{key:msg}]{
+	//     is_admin
+
+	//     key :="example_key3"
+	//     msg :="example message4"
+	// }
+	// hello {
+	//     m := input.message
+	//     m == "world"
+	// }
+	//     `
+
+	ctx := context.Background()
 
 	input := map[string]interface{}{
 		"method": "GET",
@@ -116,13 +117,13 @@ func main() {
 	// 	rego.Input(input),
 	// ).PrepareForEval(ctx)
 
-	compiler, _ := getCompiler()
+	compiler := getCompiler()
 	query, err := rego.New(
 		rego.Query("data.main"),
 		rego.Compiler(compiler),
 		rego.Input(input),
 	).PrepareForEval(ctx)
-    
+
 	rs, err := query.Eval(ctx, rego.EvalInput(input))
 	// result := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
 	// for _, value := range rs[0].Expressions[0].Value.([]interface{}) {
