@@ -121,7 +121,6 @@ func main() {
 	query, err := rego.New(
 		rego.Query("data.main"),
 		rego.Compiler(compiler),
-		rego.Input(input),
 	).PrepareForEval(ctx)
 
 	rs, err := query.Eval(ctx, rego.EvalInput(input))
