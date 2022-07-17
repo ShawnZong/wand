@@ -26,15 +26,12 @@ func readFile(path string) *[]byte {
 	return &rawFile
 }
 
-func parseConfiguration(path string) map[string]interface{} {
-	rawFile, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Fatalf("Error when loading configuration file %v: %v", path, err)
-	}
+func parseConfiguration(rawFile *[]byte) map[string]interface{} {
+
 	parsedFile := make(map[string]interface{})
 
-	if err := yaml.Unmarshal(rawFile, &parsedFile); err != nil {
-		log.Fatalf("Error when parsing configuration file %v: %v", path, err)
+	if err := yaml.Unmarshal(*rawFile, &parsedFile); err != nil {
+		log.Fatalf("Error when parsing configuration file: %v", err)
 	}
 	return parsedFile
 }
