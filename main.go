@@ -18,6 +18,13 @@ import (
 
 //     for i:= range
 // }
+func readFile(path string) *[]byte {
+	rawFile, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalf("Error when loading configuration file %v: %v", path, err)
+	}
+	return &rawFile
+}
 
 func parseConfiguration(path string) map[string]interface{} {
 	rawFile, err := ioutil.ReadFile(path)
