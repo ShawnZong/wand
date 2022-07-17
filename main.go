@@ -33,7 +33,27 @@ func parseConfiguration(rawFile *[]byte) map[string]interface{} {
 	if err := yaml.Unmarshal(*rawFile, &parsedFile); err != nil {
 		log.Fatalf("Error when parsing configuration file: %v", err)
 	}
+
 	return parsedFile
+}
+
+func appendOptional2Configuration(rawFile *[]byte, hints []interface{}) *[]byte {
+	var yamlNode yaml.Node
+	if err := yaml.Unmarshal(*rawFile, &yamlNode); err != nil {
+		log.Fatal(err)
+	}
+	// TODO add optional messages to yamlNode
+	// for loop hints and then add optional messages to each Node
+
+	updatedConfiguration, err := yaml.Marshal(yamlNode)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &updatedConfiguration
+}
+
+func writeYAML(filename string, data *[]byte) {
+	ioutil.WriteFile(filename, *data, 0644)
 }
 
 func getCompiler() *ast.Compiler {
@@ -57,19 +77,19 @@ func extractOptional(queryResult rego.ResultSet) []interface{} {
 }
 
 func main() {
-    rawFile:=readFile("./example.yaml")
+	rawFile := readFile("./example2.yaml")
 	yamlfile := parseConfiguration(rawFile)
-	fmt.Println(yamlfile["taskdefinition"].(map[string]interface{})["Properties"])
+	// fmt.Println(yamlfile)
 	ctx := context.Background()
 
-	input := map[string]interface{}{
-		"method": "GET",
-		"path":   []interface{}{"salary", "bob"},
-		"subject": map[string]interface{}{
-			"user":   "bob",
-			"groups": []interface{}{"sales", "marketing", "admin"},
-		},
-	}
+	// input := map[string]interface{}{
+	// 	"method": "GET",
+	// 	"path":   []interface{}{"salary", "bob"},
+	// 	"subject": map[string]interface{}{
+	// 		"user":   "bob",
+	// 		"groups": []interface{}{"sales", "marketing", "admin"},
+	// 	},
+	// }
 
 	// rs, err := rego.New(
 	// 	rego.Query("data.main"),
@@ -95,7 +115,7 @@ func main() {
 		rego.Compiler(compiler),
 	).PrepareForEval(ctx)
 
-	rs, err := query.Eval(ctx, rego.EvalInput(input))
+	rs, err := query.Eval(ctx, rego.EvalInput(yamlfile))
 	// result := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
 	// for _, value := range rs[0].Expressions[0].Value.([]interface{}) {
 	// 	result := value.(map[string]interface{})
@@ -105,7 +125,14 @@ func main() {
 	result := extractOptional(rs)
 	fmt.Println(result)
 	fmt.Println(reflect.TypeOf(result))
-
+	for i, item := range result {
+		fmt.Println(i)
+		fmt.Println(item)
+		for key, value := range item.(map[string]interface{}) {
+			fmt.Println(key)
+			fmt.Println(value)
+		}
+	}
 	// fmt.Println(rs)
 	// fmt.Println(reflect.TypeOf(rs))
 

@@ -1,0 +1,11 @@
+method: "GET"
+path:
+  - "salary"
+  - "bob"
+subject:
+  # comment
+  user: "bob"
+  groups:
+    - "sales"
+    - "marketing"
+    - "admin"
