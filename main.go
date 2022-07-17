@@ -57,8 +57,8 @@ func extractOptional(queryResult rego.ResultSet) []interface{} {
 }
 
 func main() {
-
-	yamlfile := parseConfiguration("./example.yaml")
+    rawFile:=readFile("./example.yaml")
+	yamlfile := parseConfiguration(rawFile)
 	fmt.Println(yamlfile["taskdefinition"].(map[string]interface{})["Properties"])
 	ctx := context.Background()
 
