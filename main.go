@@ -34,12 +34,12 @@ func parseConfiguration(rawFile *[]byte) map[string]interface{} {
 	return parsedFile
 }
 
-func findElements(yamlNode yaml.Node, path string) []*yaml.Node {
+func findElements(yamlNode *yaml.Node, path string) []*yaml.Node {
 	pathQuery, err := yamlpath.NewPath(path)
 	if err != nil {
 		log.Fatalf("cannot create path query: %v", err)
 	}
-	elements, err := pathQuery.Find(&yamlNode)
+	elements, err := pathQuery.Find(yamlNode)
 	if err != nil {
 		log.Fatalf("error when finding elements: %v", err)
 	}
@@ -55,17 +55,11 @@ func appendOptional2Configuration(rawFile *[]byte, hints []interface{}) *[]byte 
 	// TODO add optional messages to yamlNode
 	// for loop hints and then add optional messages to each Node
 	appendHint := func(node *yaml.Node, key string, msg string) {
-		pathQuery, err := yamlpath.NewPath(key)
-		if err != nil {
-			log.Fatalf("cannot create path query: %v", err)
-		}
-		elements, err := pathQuery.Find(&yamlNode)
-		if err != nil {
-			log.Fatalf("error when finding elements: %v", err)
-		}
+		elements := findElements(&yamlNode, key)
 		for _, element := range elements {
-			element.HeadComment = element.HeadComment + " msg"
+			element.LineComment = element.LineComment + msg
 		}
+
 	}
 	for _, hint := range hints {
 		for key, msg := range hint.(map[string]interface{}) {
@@ -107,7 +101,8 @@ func extractOptional(queryResult rego.ResultSet) []interface{} {
 }
 
 func main() {
-	rawFile := readFile("./example.yaml")
+	filename := "example.yaml"
+	rawFile := readFile(filename)
 	yamlfile := parseConfiguration(rawFile)
 	// fmt.Println(yamlfile)
 	ctx := context.Background()
@@ -153,7 +148,8 @@ func main() {
 	// }
 	// hints := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
 	hints := extractOptional(rs)
-	appendOptional2Configuration(rawFile, hints)
+	updatedFile := appendOptional2Configuration(rawFile, hints)
+	writeYAML("copy_"+filename, updatedFile)
 
 	fmt.Println(hints)
 	fmt.Println(reflect.TypeOf(hints))
