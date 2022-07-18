@@ -48,7 +48,7 @@ func getCompiler(policyPath string) *ast.Compiler {
 
 func NewRegoObject() (*rego.PreparedEvalQuery, context.Context) {
 	ctx := context.Background()
-	compiler := getCompiler("../policies")
+	compiler := getCompiler("../../policies")
 	query, err := rego.New(
 		rego.Query("data.main"),
 		rego.Compiler(compiler),
