@@ -30,7 +30,7 @@ func WriteFile(filename string, data *[]byte) {
 
 // load policy files and feed them to a rego compiler
 // return a rego compiler loaded with polcy files
-func GetCompiler(policyPath string) *ast.Compiler {
+func getCompiler(policyPath string) *ast.Compiler {
 	path := []string{policyPath}
 	policies, err := loader.AllRegos(path)
 	if err != nil {
@@ -48,7 +48,7 @@ func GetCompiler(policyPath string) *ast.Compiler {
 
 func NewRegoObject() (*rego.PreparedEvalQuery, context.Context) {
 	ctx := context.Background()
-	compiler := GetCompiler("../policies")
+	compiler := getCompiler("../policies")
 	query, err := rego.New(
 		rego.Query("data.main"),
 		rego.Compiler(compiler),
