@@ -59,7 +59,7 @@ func main() {
 	// hints := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
 	hints := util.ExtractOptional(rs)
 	updatedFile := util.AppendOptional2Configuration(rawFile, hints)
-	util.WriteFile("copy_"+filename, updatedFile)
+	util.WriteFile("updated_"+filename, updatedFile)
 
 	fmt.Println(hints)
 	fmt.Println(reflect.TypeOf(hints))
