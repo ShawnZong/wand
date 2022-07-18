@@ -34,6 +34,19 @@ func parseConfiguration(rawFile *[]byte) map[string]interface{} {
 	return parsedFile
 }
 
+func findElements(yamlNode yaml.Node, path string) []*yaml.Node {
+	pathQuery, err := yamlpath.NewPath(path)
+	if err != nil {
+		log.Fatalf("cannot create path query: %v", err)
+	}
+	elements, err := pathQuery.Find(&yamlNode)
+	if err != nil {
+		log.Fatalf("error when finding elements: %v", err)
+	}
+
+	return elements
+}
+
 func appendOptional2Configuration(rawFile *[]byte, hints []interface{}) *[]byte {
 	var yamlNode yaml.Node
 	if err := yaml.Unmarshal(*rawFile, &yamlNode); err != nil {
