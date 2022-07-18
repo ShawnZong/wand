@@ -1,10 +1,7 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-
+	"log"
 	util "tan/policychampion/internal"
 
 	"github.com/open-policy-agent/opa/rego"
@@ -15,7 +12,6 @@ func main() {
 	rawFile := util.ReadFile(filename)
 	yamlfile := util.ParseConfiguration(rawFile)
 	// fmt.Println(yamlfile)
-	ctx := context.Background()
 
 	// input := map[string]interface{}{
 	// 	"method": "GET",
@@ -44,12 +40,7 @@ func main() {
 	// 	rego.Input(input),
 	// ).PrepareForEval(ctx)
 
-	compiler := util.GetCompiler("../../policies")
-	query, err := rego.New(
-		rego.Query("data.main"),
-		rego.Compiler(compiler),
-	).PrepareForEval(ctx)
-
+	query, ctx := util.NewRegoObject()
 	rs, err := query.Eval(ctx, rego.EvalInput(yamlfile))
 	// hints := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
 	// for _, value := range rs[0].Expressions[0].Value.([]interface{}) {
@@ -57,20 +48,22 @@ func main() {
 	// 	fmt.Println(hints["key"])
 	// }
 	// hints := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
-	hints := util.ExtractOptional(rs)
-	updatedFile := util.AppendOptional2Configuration(rawFile, hints)
+	if err != nil {
+		log.Fatalf("error when evaluating Rego query: %v", err)
+	}
+	updatedFile := util.AppendOptional2Configuration(rawFile, rs)
 	util.WriteFile("updated_"+filename, updatedFile)
 
-	fmt.Println(hints)
-	fmt.Println(reflect.TypeOf(hints))
-	for i, item := range hints {
-		fmt.Println(i)
-		fmt.Println(item)
-		for key, value := range item.(map[string]interface{}) {
-			fmt.Println(key)
-			fmt.Println(value)
-		}
-	}
+	// fmt.Println(hints)
+	// fmt.Println(reflect.TypeOf(hints))
+	// for i, item := range hints {
+	// 	fmt.Println(i)
+	// 	fmt.Println(item)
+	// 	for key, value := range item.(map[string]interface{}) {
+	// 		fmt.Println(key)
+	// 		fmt.Println(value)
+	// 	}
+	// }
 	// fmt.Println(rs)
 	// fmt.Println(reflect.TypeOf(rs))
 
@@ -87,6 +80,6 @@ func main() {
 
 	// Inspect result.
 	// fmt.Println("value:", rs[0].Bindings)
-	fmt.Println("err:", err)
+	// fmt.Println("err:", err)
 
 }
