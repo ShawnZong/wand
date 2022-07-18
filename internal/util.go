@@ -10,6 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// read a file
+// return raw byte data
 func ReadFile(path string) *[]byte {
 	rawFile, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -18,10 +20,14 @@ func ReadFile(path string) *[]byte {
 	return &rawFile
 }
 
+// given filename and raw byte data of a file
+// create a new file
 func WriteFile(filename string, data *[]byte) {
 	ioutil.WriteFile(filename, *data, 0644)
 }
 
+// load policy files and feed them to a rego compiler
+// return a rego compiler loaded with polcy files
 func GetCompiler(policyPath string) *ast.Compiler {
 	path := []string{policyPath}
 	policies, err := loader.AllRegos(path)
@@ -38,6 +44,8 @@ func GetCompiler(policyPath string) *ast.Compiler {
 	return compiler
 }
 
+// parse raw byte data of a file to Golang variables
+// return sturctured data
 func ParseConfiguration(rawFile *[]byte) map[string]interface{} {
 
 	parsedFile := make(map[string]interface{})
@@ -49,6 +57,8 @@ func ParseConfiguration(rawFile *[]byte) map[string]interface{} {
 	return parsedFile
 }
 
+// find corresponding YAML Nodes based on a JSONPath query
+// return found Nodes in a YAML Node tree
 func FindElements(yamlNode *yaml.Node, path string) []*yaml.Node {
 	pathQuery, err := yamlpath.NewPath(path)
 	if err != nil {
