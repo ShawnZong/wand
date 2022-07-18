@@ -12,12 +12,9 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/loader"
 	"github.com/open-policy-agent/opa/rego"
+	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 )
 
-// func ExecuteOptional(modules []string,input map[string]interface{}){
-
-//     for i:= range
-// }
 func readFile(path string) *[]byte {
 	rawFile, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -44,8 +41,28 @@ func appendOptional2Configuration(rawFile *[]byte, hints []interface{}) *[]byte 
 	}
 	// TODO add optional messages to yamlNode
 	// for loop hints and then add optional messages to each Node
-
-	updatedConfiguration, err := yaml.Marshal(yamlNode)
+	appendHint := func(node *yaml.Node, key string, msg string) {
+		pathQuery, err := yamlpath.NewPath(key)
+		if err != nil {
+			log.Fatalf("cannot create path query: %v", err)
+		}
+		elements, err := pathQuery.Find(&yamlNode)
+		if err != nil {
+			log.Fatalf("error when finding elements: %v", err)
+		}
+		for _, element := range elements {
+			element.HeadComment = element.HeadComment + " msg"
+		}
+	}
+	for _, hint := range hints {
+		for key, msg := range hint.(map[string]interface{}) {
+			appendHint(&yamlNode, key, msg.(string))
+			fmt.Println(key)
+			fmt.Println(msg)
+			//TODO find the key in yaml node tree and then append hint to head comment
+		}
+	}
+	updatedConfiguration, err := yaml.Marshal(&yamlNode)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,7 +94,7 @@ func extractOptional(queryResult rego.ResultSet) []interface{} {
 }
 
 func main() {
-	rawFile := readFile("./example2.yaml")
+	rawFile := readFile("./example.yaml")
 	yamlfile := parseConfiguration(rawFile)
 	// fmt.Println(yamlfile)
 	ctx := context.Background()
@@ -116,16 +133,18 @@ func main() {
 	).PrepareForEval(ctx)
 
 	rs, err := query.Eval(ctx, rego.EvalInput(yamlfile))
-	// result := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
+	// hints := rs[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface {})[0].(map[string]interface{})
 	// for _, value := range rs[0].Expressions[0].Value.([]interface{}) {
-	// 	result := value.(map[string]interface{})
-	// 	fmt.Println(result["key"])
+	// 	hints := value.(map[string]interface{})
+	// 	fmt.Println(hints["key"])
 	// }
-	// result := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
-	result := extractOptional(rs)
-	fmt.Println(result)
-	fmt.Println(reflect.TypeOf(result))
-	for i, item := range result {
+	// hints := rs[0].Expressions[0].Value.([]interface{})[1].(map[string]interface{})
+	hints := extractOptional(rs)
+	appendOptional2Configuration(rawFile, hints)
+
+	fmt.Println(hints)
+	fmt.Println(reflect.TypeOf(hints))
+	for i, item := range hints {
 		fmt.Println(i)
 		fmt.Println(item)
 		for key, value := range item.(map[string]interface{}) {
