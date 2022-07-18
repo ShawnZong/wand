@@ -1,11 +1,13 @@
 package util
 
 import (
+	"context"
 	"io/ioutil"
 	"log"
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/loader"
+	"github.com/open-policy-agent/opa/rego"
 	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"gopkg.in/yaml.v3"
 )
@@ -42,6 +44,20 @@ func GetCompiler(policyPath string) *ast.Compiler {
 	compiler := ast.NewCompiler().WithCapabilities(ast.CapabilitiesForThisVersion())
 	compiler.Compile(policies.ParsedModules())
 	return compiler
+}
+
+func NewRegoObject() (*rego.PreparedEvalQuery, context.Context) {
+	ctx := context.Background()
+	compiler := GetCompiler("../policies")
+	query, err := rego.New(
+		rego.Query("data.main"),
+		rego.Compiler(compiler),
+	).PrepareForEval(ctx)
+
+	if err != nil {
+		log.Fatalf("cannot create new rego object: %v", err)
+	}
+	return &query, ctx
 }
 
 // parse raw byte data of a file to Golang variables
