@@ -87,3 +87,15 @@ func FindElements(yamlNode *yaml.Node, path string) []*yaml.Node {
 
 	return elements
 }
+
+func EvalPolicy(rawFile *[]byte) rego.ResultSet {
+
+	yamlfile := ParseConfiguration(rawFile)
+
+	query, ctx := NewRegoObject()
+	resultSet, err := query.Eval(ctx, rego.EvalInput(yamlfile))
+	if err != nil {
+		log.Fatalf("error when evaluating Rego query: %v", err)
+	}
+	return resultSet
+}
