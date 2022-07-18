@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/open-policy-agent/opa v0.42.2
-	github.com/sergi/go-diff v1.1.0
 	github.com/vmware-labs/yaml-jsonpath v0.3.2
 	gopkg.in/yaml.v3 v3.0.1
 )
