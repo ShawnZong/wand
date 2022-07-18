@@ -2,8 +2,11 @@ taskdefinition:
   Type: AWS::ECS::TaskDefinition
   Properties:
     ContainerDefinitions:
-      - Name:
-          Ref: "AppName"
+    # 1
+      - Name: # 2
+          Ref: "AppName" # 3
+          # 4
+    # 5      
         MountPoints:
           - SourceVolume: "my-vol"
             ContainerPath: "/var/www/my-vol"

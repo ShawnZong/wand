@@ -11,8 +11,8 @@ allow {
 optional[{key: msg}] {
 	is_admin
 
-	key := "example_key"
-	msg := "example message"
+	key := "$..ContainerDefinitions..[?(@.Image=='busybox')].Name"
+	msg := "example appended comment"
 }
 
 optional[{key: msg}] {
@@ -23,5 +23,6 @@ optional[{key: msg}] {
 }
 
 is_admin {
-	"admin" in input.subject.groups
+	# "admin" in input.subject.groups
+	true
 }
