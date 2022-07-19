@@ -10,7 +10,13 @@ import (
 // given OPA query result set, extracts the set of optional rules
 // return extracted optional result set
 func ExtractOptional(queryResult rego.ResultSet) []interface{} {
-	return queryResult[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface{})
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatalf("Fail execute optional rules: %v", err)
+		}
+	}()
+	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface{})
+	return results
 }
 
 // given raw byte data of a YAML, decision results returned by OPA
