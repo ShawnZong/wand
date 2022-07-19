@@ -22,7 +22,7 @@ func ExtractProhibited(queryResult rego.ResultSet) []interface{} {
 // given raw byte data of a YAML, decision results returned by OPA
 // remove prohibited YAML nodes and append comments to YAML nodes
 // return raw byte data of a updated YAML
-func ExucutePrihibitedRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
+func ExecuteProhibitedRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 	// extract prohibited result set
 	hints := ExtractProhibited(queryResult)
 

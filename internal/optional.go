@@ -22,7 +22,7 @@ func ExtractOptional(queryResult rego.ResultSet) []interface{} {
 // given raw byte data of a YAML, decision results returned by OPA
 // append comments to YAML nodes
 // return raw byte data of a updated YAML
-func AppendOptional2Configuration(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
+func ExecuteOptionalRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 	// extract optional result set
 	hints := ExtractOptional(queryResult)
 
