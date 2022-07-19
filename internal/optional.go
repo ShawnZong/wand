@@ -35,9 +35,8 @@ func AppendOptional2Configuration(rawFile *[]byte, queryResult rego.ResultSet) *
 	appendHint := func(node *yaml.Node, key string, msg string) {
 		elements := FindElements(&yamlNode, key)
 		for _, element := range elements {
-			element.LineComment = element.LineComment + msg
+			element.HeadComment = element.HeadComment + " " + msg
 		}
-
 	}
 
 	// for loop hints and then add optional messages to each Node
