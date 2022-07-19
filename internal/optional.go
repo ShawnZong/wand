@@ -15,8 +15,12 @@ func ExtractOptional(queryResult rego.ResultSet) []interface{} {
 			log.Fatalf("Fail execute optional rules: %v", err)
 		}
 	}()
-	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["optional"].([]interface{})
-	return results
+	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["optional"]
+	if results == nil {
+		log.Println("no results of optional rules")
+		return []interface{}{}
+	}
+	return results.([]interface{})
 }
 
 // given raw byte data of a YAML, decision results returned by OPA

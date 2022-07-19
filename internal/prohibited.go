@@ -15,8 +15,12 @@ func ExtractProhibited(queryResult rego.ResultSet) []interface{} {
 			log.Fatalf("Fail execute prohibited rules: %v", err)
 		}
 	}()
-	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["prohibited"].([]interface{})
-	return results
+	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["prohibited"]
+	if results == nil {
+		log.Println("no results of prohibited rules")
+		return []interface{}{}
+	}
+	return results.([]interface{})
 }
 
 // given raw byte data of a YAML, decision results returned by OPA
