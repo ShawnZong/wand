@@ -100,11 +100,16 @@ func EvalPolicy(rawFile *[]byte) rego.ResultSet {
 	return resultSet
 }
 
+// concat two comments
 func AppendComment(comment1 string, comment2 string) string {
 	if comment1 == "" {
 		return comment2
+	} else {
+		if comment2 != "" {
+			return comment1 + " " + comment2
+		}
 	}
-	return comment1 + " " + comment2
+	return ""
 }
 
 // given OPA query result set, extracts the result set from rule execution
