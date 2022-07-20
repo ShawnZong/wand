@@ -106,3 +106,39 @@ func AppendComment(comment1 string, comment2 string) string {
 	}
 	return comment1 + " " + comment2
 }
+
+// given OPA query result set, extracts the result set from rule execution
+// return extracted result set
+func ExtractRuleResult(queryResult rego.ResultSet, ruleName string) []interface{} {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatalf("Fail execute %v rules: %v", ruleName, err)
+		}
+	}()
+	results := queryResult[0].Expressions[0].Value.(map[string]interface{})[ruleName]
+	if results == nil {
+		log.Printf("no results of %v rules", ruleName)
+		return []interface{}{}
+	}
+	return results.([]interface{})
+}
+
+// given raw byte data of a YAML, rule result set as hints and function to apply rules
+// apply rules to a YAML file
+// return raw byte data of a updated YAML
+func ExecuteRule(rawFile *[]byte, hints []interface{}, handleFunc func(*yaml.Node, map[string]interface{})) *[]byte {
+	var yamlNode yaml.Node
+	if err := yaml.Unmarshal(*rawFile, &yamlNode); err != nil {
+		log.Fatal(err)
+	}
+
+	// loop each rule result and process corresponding YAML nodes
+	for _, hint := range hints {
+		handleFunc(&yamlNode, hint.(map[string]interface{}))
+	}
+	updatedConfiguration, err := yaml.Marshal(&yamlNode)
+	if err != nil {
+		log.Fatalf("marshal yaml error: %v", err)
+	}
+	return &updatedConfiguration
+}

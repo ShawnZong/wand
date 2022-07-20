@@ -7,28 +7,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// given OPA query result set, extracts the set of probihited rules
-// return extracted probihited result set
-func ExtractProhibited(queryResult rego.ResultSet) []interface{} {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Fatalf("Fail execute prohibited rules: %v", err)
-		}
-	}()
-	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["prohibited"]
-	if results == nil {
-		log.Println("no results of prohibited rules")
-		return []interface{}{}
-	}
-	return results.([]interface{})
-}
-
 // given raw byte data of a YAML, decision results returned by OPA
 // remove prohibited YAML nodes and append comments to YAML nodes
 // return raw byte data of a updated YAML
 func ExecuteProhibitedRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 	// extract prohibited result set
-	hints := ExtractProhibited(queryResult)
+	hints := ExtractRuleResult(queryResult, "prohibited")
 
 	var yamlNode yaml.Node
 	if err := yaml.Unmarshal(*rawFile, &yamlNode); err != nil {

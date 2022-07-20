@@ -7,28 +7,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// given OPA query result set, extracts the set of mandatory rules
-// return extracted mandatory result set
-func ExtractMandatory(queryResult rego.ResultSet) []interface{} {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Fatalf("Fail execute mandatory rules: %v", err)
-		}
-	}()
-	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["mandatory"]
-	if results == nil {
-		log.Println("no results of mandatory rules")
-		return []interface{}{}
-	}
-	return results.([]interface{})
-}
-
 // given raw byte data of a YAML, decision results returned by OPA
 // append YAML template under specified key and add comments to YAML nodes
 // return raw byte data of a updated YAML
 func ExecuteMandatoryRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 	// extract mandatory result set
-	hints := ExtractMandatory(queryResult)
+	hints := ExtractRuleResult(queryResult, "mandatory")
 
 	var yamlNode yaml.Node
 	if err := yaml.Unmarshal(*rawFile, &yamlNode); err != nil {

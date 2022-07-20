@@ -7,28 +7,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// given OPA query result set, extracts the set of optional rules
-// return extracted optional result set
-func ExtractOptional(queryResult rego.ResultSet) []interface{} {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Fatalf("Fail execute optional rules: %v", err)
-		}
-	}()
-	results := queryResult[0].Expressions[0].Value.(map[string]interface{})["optional"]
-	if results == nil {
-		log.Println("no results of optional rules")
-		return []interface{}{}
-	}
-	return results.([]interface{})
-}
-
 // given raw byte data of a YAML, decision results returned by OPA
 // append comments to YAML nodes
 // return raw byte data of a updated YAML
 func ExecuteOptionalRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 	// extract optional result set
-	hints := ExtractOptional(queryResult)
+	hints := ExtractRuleResult(queryResult, "optional")
 
 	var yamlNode yaml.Node
 	if err := yaml.Unmarshal(*rawFile, &yamlNode); err != nil {
