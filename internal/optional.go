@@ -35,7 +35,7 @@ func ExecuteOptionalRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 		log.Fatal(err)
 	}
 
-	// func: add optional messages to a YAML Node as inline comment
+	// func: add optional messages to a YAML Node as comment
 	appendHint := func(node *yaml.Node, key string, msg string) {
 		elements := FindElements(&yamlNode, key)
 		for _, element := range elements {
