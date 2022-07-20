@@ -2,7 +2,8 @@ package main
 
 import (
 	"flag"
-	util "tan/policychampion/internal"
+
+	util "github.com/ShawnZong/policy-champion/internal"
 )
 
 func main() {
