@@ -74,6 +74,8 @@ func FindElements(yamlNode *yaml.Node, path string) []*yaml.Node {
 	return elements
 }
 
+// given rego pacakge name and folder path where policies are located
+// return a Rego query object which is ready for execution
 func NewRegoObject(regoNamespace string, policyPath string) (*rego.PreparedEvalQuery, context.Context) {
 	ctx := context.Background()
 	compiler := getCompiler("../../" + policyPath)
