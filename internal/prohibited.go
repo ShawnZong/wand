@@ -43,7 +43,7 @@ func ExecuteProhibitedRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte 
 			var emptyElement yaml.Node
 			emptyElement.Kind = yaml.ScalarNode
 			emptyElement.Value = "null"
-			emptyElement.HeadComment = element.HeadComment + " " + msg
+			emptyElement.HeadComment = AppendComment(element.HeadComment, msg)
 			*element = emptyElement
 		}
 

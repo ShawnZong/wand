@@ -46,9 +46,9 @@ func ExecuteMandatoryRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 			// if the YAML Node is empty, replace empty Node directly with template Node
 			if len(element.Content) == 0 {
 				*element = *refYAML.Content[0]
-				element.HeadComment = element.HeadComment + msg
+				element.HeadComment = AppendComment(element.HeadComment, msg)
 			} else {
-				refYAML.Content[0].HeadComment = refYAML.Content[0].HeadComment + msg
+				refYAML.Content[0].HeadComment = AppendComment(refYAML.Content[0].HeadComment, msg)
 				element.Content = append(element.Content, refYAML.Content...)
 			}
 		}

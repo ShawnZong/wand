@@ -99,3 +99,10 @@ func EvalPolicy(rawFile *[]byte) rego.ResultSet {
 	}
 	return resultSet
 }
+
+func AppendComment(comment1 string, comment2 string) string {
+	if comment1 == "" {
+		return comment2
+	}
+	return comment1 + " " + comment2
+}

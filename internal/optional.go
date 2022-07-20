@@ -39,7 +39,7 @@ func ExecuteOptionalRule(rawFile *[]byte, queryResult rego.ResultSet) *[]byte {
 	appendHint := func(node *yaml.Node, key string, msg string) {
 		elements := FindElements(&yamlNode, key)
 		for _, element := range elements {
-			element.HeadComment = element.HeadComment + " " + msg
+			element.HeadComment = AppendComment(element.HeadComment, msg)
 		}
 	}
 
