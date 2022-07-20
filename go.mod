@@ -1,4 +1,4 @@
-module tan/policychampion
+module github.com/ShawnZong/policy-champion
 
 go 1.18
 
