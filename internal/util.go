@@ -46,20 +46,6 @@ func getCompiler(policyPath string) *ast.Compiler {
 	return compiler
 }
 
-func NewRegoObject() (*rego.PreparedEvalQuery, context.Context) {
-	ctx := context.Background()
-	compiler := getCompiler("../../policies")
-	query, err := rego.New(
-		rego.Query("data.main"),
-		rego.Compiler(compiler),
-	).PrepareForEval(ctx)
-
-	if err != nil {
-		log.Fatalf("cannot create new rego object: %v", err)
-	}
-	return &query, ctx
-}
-
 // parse raw byte data of a file to Golang variables
 // return sturctured data
 func ParseConfiguration(rawFile *[]byte) map[string]interface{} {
@@ -88,15 +74,29 @@ func FindElements(yamlNode *yaml.Node, path string) []*yaml.Node {
 	return elements
 }
 
+func NewRegoObject(regoNamespace string, policyPath string) (*rego.PreparedEvalQuery, context.Context) {
+	ctx := context.Background()
+	compiler := getCompiler("../../" + policyPath)
+	query, err := rego.New(
+		rego.Query("data."+regoNamespace),
+		rego.Compiler(compiler),
+	).PrepareForEval(ctx)
+
+	if err != nil {
+		log.Fatalf("cannot create new rego object: %v", err)
+	}
+	return &query, ctx
+}
+
 // given raw bytes of a YAML file
 // apply Rego query on it
 // return rego result set
-func EvalPolicy(rawFile *[]byte) rego.ResultSet {
+func EvalPolicy(rawFile *[]byte, regoNamespace string, policyPath string) rego.ResultSet {
 
 	yamlfile := ParseConfiguration(rawFile)
 
 	// load Rego policy files
-	query, ctx := NewRegoObject()
+	query, ctx := NewRegoObject(regoNamespace, policyPath)
 
 	// evaluate rego queries
 	resultSet, err := query.Eval(ctx, rego.EvalInput(yamlfile))
