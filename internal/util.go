@@ -78,7 +78,7 @@ func FindElements(yamlNode *yaml.Node, path string) []*yaml.Node {
 // return a Rego query object which is ready for execution
 func NewRegoObject(regoNamespace string, policyPath string) (*rego.PreparedEvalQuery, context.Context) {
 	ctx := context.Background()
-	compiler := getCompiler("../../" + policyPath)
+	compiler := getCompiler(policyPath)
 	query, err := rego.New(
 		rego.Query("data."+regoNamespace),
 		rego.Compiler(compiler),

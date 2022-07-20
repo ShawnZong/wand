@@ -24,7 +24,7 @@ func appendMsgTemplate(node *yaml.Node, hint map[string]interface{}) {
 	// load reference template, because the template might be different
 	// we need to load the template separately each time
 	var refYAML yaml.Node
-	if err := yaml.Unmarshal(*ReadFile("../../" + ref), &refYAML); err != nil {
+	if err := yaml.Unmarshal(*ReadFile(ref), &refYAML); err != nil {
 		log.Fatalf("load ref file error: %v", err)
 	}
 
