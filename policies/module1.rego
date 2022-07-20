@@ -47,7 +47,7 @@ mandatory[{key:msg,"templateRef":templateRef}]{
 
 	key:="$..ContainerDefinitions"
 	msg:="mandatory msg 1"
-	templateRef:="templates/ref.yaml"
+	templateRef:="../../templates/ref.yaml"
 }
 
 mandatory[{key:msg,"templateRef":templateRef}]{
@@ -55,7 +55,7 @@ mandatory[{key:msg,"templateRef":templateRef}]{
 
 	key:="$..Volumes"
 	msg:="mandatory msg 2"
-	templateRef:="templates/ref2.yaml"
+	templateRef:="../../templates/ref2.yaml"
 }
 
 is_admin = true
