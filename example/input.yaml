@@ -1,0 +1,4 @@
+Configuration:
+  Type: "web"
+  Protocol: "foo"
+  Port: "80"
