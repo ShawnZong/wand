@@ -35,6 +35,11 @@ func appendMsgTemplate(node *yaml.Node, hint map[string]interface{}) {
 		if len(element.Content) == 0 {
 			*element = *refYAML.Content[0]
 			element.HeadComment = AppendComment(element.HeadComment, msg)
+		} else if element.Content[0].Kind == yaml.ScalarNode {
+			// if the parent node is not a Mapping Type, we can't simply append reference Node
+			// we need to extract the content of reference node
+			refYAML.Content[0].Content[0].HeadComment = AppendComment(refYAML.Content[0].Content[0].HeadComment, msg)
+			element.Content = append(element.Content, refYAML.Content[0].Content...)
 		} else {
 			// if the YAML Node is not empty, append template Node to existing Nodes
 			refYAML.Content[0].HeadComment = AppendComment(refYAML.Content[0].HeadComment, msg)
