@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	util "github.com/ShawnZong/policy-champion/internal"
+	util "github.com/ShawnZong/wand/internal"
 )
 
 func main() {
@@ -17,8 +17,8 @@ func main() {
 	rawFile := util.ReadFile(*inputPath)
 	resultSet := util.EvalPolicy(rawFile, *regoNamespace, *policyPath)
 	updatedFile := util.ExecuteProhibitedRule(rawFile, resultSet)
-	updatedFile = util.ExecuteOptionalRule(updatedFile, resultSet)
 	updatedFile = util.ExecuteMandatoryRule(updatedFile, resultSet)
+	updatedFile = util.ExecuteOptionalRule(updatedFile, resultSet)
 
 	util.WriteFile(*outputPath, updatedFile)
 }

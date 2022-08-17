@@ -1,4 +1,4 @@
-module github.com/ShawnZong/policy-champion
+module github.com/ShawnZong/wand
 
 go 1.18
 
